@@ -1,20 +1,30 @@
 import time
-import pika
+from datetime import datetime
+import json
+from simulatediot import TemperatureSensor
+import paho.mqtt.client as mqtt
 
-port = 7
-sensor = 0
-timeout = 1
+class Simulator:
+  def __init__(self, interval):
+    self.interval= interval
 
-credentials = pika.PlainCredentials('sciot', 'Us47*nHgD')
-connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.2.7', 5672, '/', credentials))
-channel = connection.channel()
+  def start(self):
+    ts= TemperatureSensor(20, 10, 16, 35)
+    mqtt_publisher= mqtt.Client('Temperature publisher')
+    mqtt_publisher.connect('127.0.0.1', 1883, 70)
+    mqtt_publisher.loop_start()
+    while True:
+      dt = datetime.now().strftime("%d-%m-%YT%H:%M:%S")
+      message = {
+        "type-id": "de.uni-stuttgart.iaas.sc." + ts.sensor_type,
+        "instance-id": ts.instance_id,
+        "timestamp": dt,
+        "value": {ts.unit: ts.sense()
+        }
+      }
+      jmsg= json.dumps(message, indent=4)
+      mqtt_publisher.publish('u38/0/353/window/' + ts.sensor_type+ '/' + ts.instance_id, jmsg, 2)
+      time.sleep(self.interval)
 
-channel.exchange_declare(exchange='sciot.topic', exchange_type='topic', durable=True, auto_delete=False)
-
-while True:
-  temperature = 15
-  humidity = 49
-  message = time.ctime() + ' Temperature = ' + str(temperature) + ' C, humidity = ' + str(humidity) + ' %'
-  channel.basic_publish(exchange='sciot.topic', routing_key='u38.0.353.window.temperature.12345', body=message)
-  print('Sent ' + message)
-  time.sleep(timeout)
+s = Simulator(5)
+s.start()
