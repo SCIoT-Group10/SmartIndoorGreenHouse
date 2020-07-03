@@ -1,18 +1,20 @@
-import paho.mqtt.client as mqtt
-import json
+import pika
+
+credentials = pika.PlainCredentials('user', 'password')
+connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.3.27', 5672, '/', credentials))
+channel = connection.channel()
+
+channel.exchange_declare(exchange='sciot.topic', exchange_type='topic', durable=True, auto_delete=False)
+
+channel.queue_declare(queue='sciot.temperature')
+
+channel.queue_bind(queue='sciot.temperature', exchange='sciot.topic', routing_key='u38.0.353.*.temperature.*')
 
 
-def on_message(client, userdata, message):
-    print('Message topic {}'.format(message.topic))
-    print('Message payload:')
-    print(json.loads(message.payload.decode()))
+def callback(ch, method, properties, body):
+    print('Received: {}'.format(body))
 
 
-mqtt_subscriber = mqtt.Client('Temperature subscriber')
-mqtt_subscriber.on_message = on_message
-#mqtt_subscriber.on_connect = on_connect
-
-mqtt_subscriber.connect('127.0.0.1', 1883, 70)
-mqtt_subscriber.subscribe('u38/0/353/+/temperature/+', qos=2)
-
-mqtt_subscriber.loop_forever()
+channel.basic_consume(queue='sciot.temperature', on_message_callback=callback, auto_ack=True)
+print('Waiting for messages')
+channel.start_consuming()
