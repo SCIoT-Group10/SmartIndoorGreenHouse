@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "E:\\02_Dokumente\\Arduino\\libraries\\Adafruit_Unified_Sensor",
+                "E:\\02_Dokumente\\Arduino\\libraries\\DHT_sensor_library",
+                "E:\\02_Dokumente\\Arduino\\libraries\\SimpleDHT",
+                "E:\\02_Dokumente\\Arduino\\libraries\\BH1750\\src",
+                "C:\\Program Files (x86)\\Arduino\\tools\\**",
+                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\**"
+            ],
+            "forcedInclude": [
+                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
+            ],
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 4
+}
