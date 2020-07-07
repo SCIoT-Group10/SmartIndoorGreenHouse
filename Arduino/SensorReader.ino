@@ -4,34 +4,73 @@
 #include <Wire.h>
 
 #define SOIL_MOISTURE_PIN A0
-#define RELAIS1 2
-#define RELAIS2 3
+#define RELAISPUMP 2
+#define RELAISLIGHT 3
 #define DHTPIN 4
 
 #define DHTTYPE DHT22
 
 BH1750 lightSensor;
 DHT dhtSensor(DHTPIN, DHTTYPE);
+int incoming = 0;
 
 
 void setup() {
     pinMode(SOIL_MOISTURE_PIN, INPUT);
-    pinMode(RELAIS1, OUTPUT);
-    pinMode(RELAIS2, OUTPUT);
+    pinMode(RELAISPUMP, OUTPUT);
+    pinMode(RELAISLIGHT, OUTPUT);
 
     Serial.begin(9600); /* Begin der Seriellenkommunikation */
     dhtSensor.begin();
-    //Wire.begin();
-    //lightSensor.begin();
+    Wire.begin();
+    lightSensor.begin();
 }
 
 void loop() {
-    //switchRelais();
-    getSoilMoisture();
-    //getLightSensorData();
-    getTemperature();
-    getHumidity();
-    delay(5000);
+
+    if (Serial.available() > 0) {
+        // Lies das eingehende Byte:
+        incoming = Serial.read();
+
+        // Ausgeben:
+        //Serial.print("I received: ");
+        //Serial.println(incoming);
+        switch (incoming)
+        {
+        case 97: //received a
+            getTemperature();
+            break;
+        case 98: //received b
+            getHumidity();
+            break;
+        case 99: //received c
+            getLightSensorData();
+            break;
+        case 100: //received d
+            getSoilMoisture();
+            break;
+        case 101: //received e
+            switchRelaisOn(RELAISLIGHT);
+            break;
+        case 102: //received f
+            switchRelaisOff(RELAISLIGHT);
+            break;
+        case 103: //received g
+            switchRelaisOn(RELAISPUMP);
+            break;
+        case 104: //received h
+            switchRelaisOff(RELAISPUMP);
+            break;
+        case 105: //received i
+            openWindow();
+            break;
+        case 106: //received j
+            closeWindow();
+            break;
+        default:
+            break;
+        }
+    }
     
 }
 
@@ -40,10 +79,12 @@ void getSoilMoisture(){
     delay(10);
 }
 
-void switchRelais(){
-    digitalWrite(RELAIS2,HIGH);
-    delay(2000);
-    digitalWrite(RELAIS2,LOW);
+void switchRelaisOn(int relais){
+    digitalWrite(relais,HIGH);
+}
+
+void switchRelaisOff(int relais){
+    digitalWrite(relais,LOW);
 }
 
 void getLightSensorData(){
@@ -61,4 +102,12 @@ void getTemperature(){
 void getHumidity(){
     float Luftfeuchtigkeit = dhtSensor.readHumidity();
     Serial.println("Luftfeuchtigkeit: " + String(Luftfeuchtigkeit) +"%");
+}
+
+void openWindow(){
+
+}
+
+void closeWindow(){
+
 }
