@@ -15,6 +15,14 @@ channel = connection.channel()
 channel.exchange_declare(exchange='sciot.topic', exchange_type='topic', durable=True, auto_delete=False)
 
 
+class SensorValues:
+    temperature = 0.0
+    humidity = 0.0
+    soilMoisture = 0.0
+    lightLevel = 0.0
+    waterLevel = "empty"
+
+
 def getSensorData():
     sensorValues = SensorValues()
     sensorValues.temperature = getTemperature()
@@ -24,18 +32,6 @@ def getSensorData():
     sensorValues.waterLevel = getWaterLevel()
 
     return sensorValues
-
-
-if __name__ == '__main__':
-    while True:
-        sensorValues = getSensorData()
-
-        json = json.dumps(sensorValues)
-
-        message = time.ctime() + json
-        channel.basic_publish(exchange='sciot.topic', routing_key='u38.0.353.window.temperature.12345', body=message)
-        print('Sent ' + message)
-        time.sleep(timeout)
 
 
 def getTemperature():
@@ -66,9 +62,13 @@ def getWaterLevel():
     return "full"
 
 
-class SensorValues:
-    temperature = 0.0
-    humidity = 0.0
-    soilMoisture = 0.0
-    lightLevel = 0.0
-    waterLevel = "empty"
+if __name__ == '__main__':
+    while True:
+        sensorValues = getSensorData()
+
+        json = json.dumps(sensorValues)
+
+        message = time.ctime() + json
+        channel.basic_publish(exchange='sciot.topic', routing_key='u38.0.353.window.temperature.12345', body=message)
+        print('Sent ' + message)
+        time.sleep(timeout)
