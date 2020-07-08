@@ -60,7 +60,7 @@ if __name__ == '__main__':
     while True:
         sensorValues = getSensorData()
 
-        json = json.dumps(sensorValues)
+        jsonData = json.dumps(sensorValues)
 
-        channel.basic_publish(exchange='sciot.topic', routing_key='u38.0.353.window.temperature.12345', body=json)
+        channel.basic_publish(exchange='sciot.topic', routing_key='u38.0.353.window.temperature.12345', body=jsonData)
         time.sleep(timeout)
