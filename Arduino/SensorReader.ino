@@ -75,7 +75,7 @@ void loop() {
 }
 
 void getSoilMoisture(){
-    Serial.println("Soil Moisture: " + String(analogRead(SOIL_MOISTURE_PIN)));
+    Serial.println(String(analogRead(SOIL_MOISTURE_PIN)));
     delay(10);
 }
 
@@ -89,19 +89,23 @@ void switchRelaisOff(int relais){
 
 void getLightSensorData(){
     float lux = lightSensor.readLightLevel();
-    Serial.println("Light level: " + String(lux) + " lx");
+    Serial.println(String(lux));
     delay(10);
 }
 
 void getTemperature(){
-    float Temperatur = dhtSensor.readTemperature();
-    Serial.println("Temperatur: " + String(Temperatur) +"°C");
+    float temperature = dhtSensor.readTemperature();
+    Serial.println(String(temperature));
     
 }
 
 void getHumidity(){
-    float Luftfeuchtigkeit = dhtSensor.readHumidity();
-    Serial.println("Luftfeuchtigkeit: " + String(Luftfeuchtigkeit) +"%");
+    float humidity = dhtSensor.readHumidity();
+    Serial.println(String(humidity));
+}
+
+void getWaterLevel(){
+
 }
 
 void openWindow(){
