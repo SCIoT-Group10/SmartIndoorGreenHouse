@@ -1,6 +1,7 @@
 import time
 import pika
 import serial
+import json
 
 timeout = 30
 
@@ -15,23 +16,16 @@ channel = connection.channel()
 channel.exchange_declare(exchange='sciot.topic', exchange_type='topic', durable=True, auto_delete=False)
 
 
-class SensorValues:
-    temperature = 0.0
-    humidity = 0.0
-    soilMoisture = 0.0
-    lightLevel = 0.0
-    waterLevel = "empty"
-
-
 def getSensorData():
-    sensorValues = SensorValues()
-    sensorValues.temperature = getTemperature()
-    sensorValues.humidity = getHumidity()
-    sensorValues.lightLevel = getLightLevel()
-    sensorValues.soilMoisture = getSoilMoisture()
-    sensorValues.waterLevel = getWaterLevel()
-
-    return sensorValues
+    data = {
+        "time": time.ctime(),
+        "temperature": getTemperature(),
+        "humidity": getHumidity(),
+        "lightLevel": getLightLevel(),
+        "soilMoisture": getSoilMoisture(),
+        "waterLevel": getWaterLevel()
+    }
+    return data
 
 
 def getTemperature():
@@ -68,7 +62,5 @@ if __name__ == '__main__':
 
         json = json.dumps(sensorValues)
 
-        message = time.ctime() + json
-        channel.basic_publish(exchange='sciot.topic', routing_key='u38.0.353.window.temperature.12345', body=message)
-        print('Sent ' + message)
+        channel.basic_publish(exchange='sciot.topic', routing_key='u38.0.353.window.temperature.12345', body=json)
         time.sleep(timeout)
