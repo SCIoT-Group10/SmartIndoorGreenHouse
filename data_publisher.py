@@ -15,7 +15,18 @@ channel = connection.channel()
 channel.exchange_declare(exchange='sciot.topic', exchange_type='topic', durable=True, auto_delete=False)
 
 
-def main():
+def getSensorData():
+    sensorValues = SensorValues()
+    sensorValues.temperature = getTemperature()
+    sensorValues.humidity = getHumidity()
+    sensorValues.lightLevel = getLightLevel()
+    sensorValues.soilMoisture = getSoilMoisture()
+    sensorValues.waterLevel = getWaterLevel()
+
+    return sensorValues
+
+
+if __name__ == '__main__':
     while True:
         sensorValues = getSensorData()
 
@@ -53,17 +64,6 @@ def getSoilMoisture():
 
 def getWaterLevel():
     return "full"
-
-
-def getSensorData():
-    sensorValues = SensorValues()
-    sensorValues.temperature = getTemperature()
-    sensorValues.humidity = getHumidity()
-    sensorValues.lightLevel = getLightLevel()
-    sensorValues.soilMoisture = getSoilMoisture()
-    sensorValues.waterLevel = getWaterLevel()
-
-    return sensorValues
 
 
 class SensorValues:
