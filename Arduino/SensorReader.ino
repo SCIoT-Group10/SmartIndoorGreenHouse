@@ -2,10 +2,11 @@
 #include <DHT.h>
 #include <BH1750.h>
 #include <Wire.h>
+#include <Stepper.h>
 
 #define SOIL_MOISTURE_PIN A0
-#define RELAISPUMP 2
-#define RELAISLIGHT 3
+#define RELAISPUMP 3
+#define RELAISLIGHT 2
 #define DHTPIN 4
 
 #define DHTTYPE DHT22
@@ -14,11 +15,19 @@ BH1750 lightSensor;
 DHT dhtSensor(DHTPIN, DHTTYPE);
 int incoming = 0;
 
+const int stepsPerRevolution = 2048;
+Stepper myStepper(stepsPerRevolution, 4, 6, 5, 7);
+
 
 void setup() {
     pinMode(SOIL_MOISTURE_PIN, INPUT);
     pinMode(RELAISPUMP, OUTPUT);
     pinMode(RELAISLIGHT, OUTPUT);
+
+    digitalWrite(RELAISLIGHT,HIGH);
+    digitalWrite(RELAISPUMP,HIGH);
+
+    myStepper.setSpeed(15);
 
     Serial.begin(9600); /* Begin der Seriellenkommunikation */
     dhtSensor.begin();
@@ -50,21 +59,24 @@ void loop() {
             getSoilMoisture();
             break;
         case 101: //received e
-            switchRelaisOn(RELAISLIGHT);
+            getWaterLevel();
             break;
         case 102: //received f
-            switchRelaisOff(RELAISLIGHT);
+            switchRelaisOn(RELAISLIGHT);
             break;
         case 103: //received g
-            switchRelaisOn(RELAISPUMP);
+            switchRelaisOff(RELAISLIGHT);
             break;
         case 104: //received h
-            switchRelaisOff(RELAISPUMP);
+            switchRelaisOn(RELAISPUMP);
             break;
         case 105: //received i
-            openWindow();
+            switchRelaisOff(RELAISPUMP);
             break;
         case 106: //received j
+            openWindow();
+            break;
+        case 107: //received k
             closeWindow();
             break;
         default:
@@ -80,11 +92,11 @@ void getSoilMoisture(){
 }
 
 void switchRelaisOn(int relais){
-    digitalWrite(relais,HIGH);
+    digitalWrite(relais,LOW);
 }
 
 void switchRelaisOff(int relais){
-    digitalWrite(relais,LOW);
+    digitalWrite(relais,HIGH);
 }
 
 void getLightSensorData(){
@@ -109,9 +121,13 @@ void getWaterLevel(){
 }
 
 void openWindow(){
-
+    for(int i=0; i< stepsPerRevolution; i++){
+        myStepper.step(1);
+    }
 }
 
 void closeWindow(){
-
+    for(int i=0; i< stepsPerRevolution; i++){
+        myStepper.step(-1);
+    }
 }
