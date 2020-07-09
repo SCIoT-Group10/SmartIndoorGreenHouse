@@ -16,7 +16,7 @@ DHT dhtSensor(DHTPIN, DHTTYPE);
 int incoming = 0;
 
 const int stepsPerRevolution = 2048;
-Stepper myStepper(stepsPerRevolution, 4, 6, 5, 7);
+Stepper myStepper(stepsPerRevolution, 5, 7, 6, 8);
 
 
 void setup() {
