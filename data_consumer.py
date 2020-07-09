@@ -5,8 +5,10 @@ import pika
 credentials = pika.PlainCredentials('user', 'password')
 connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.3.42', 5672, '/', credentials))
 channel = connection.channel()
+channel2 = connection.channel()
 
 channel.exchange_declare(exchange='sciot.topic', exchange_type='topic', durable=True, auto_delete=False)
+channel2.exchange_declare(exchange='sciot.topic', exchange_type='topic', durable=True, auto_delete=False)
 
 channel.queue_declare(queue='sciot.temperature')
 
@@ -20,6 +22,9 @@ def planning(data):
     lightLevel = data['lightLevel']
     waterLevel = data['waterLevel']
     soilMoisture = data['soilMoisture']
+
+    action = "lightOn"
+    channel.basic_publish(exchange='sciot.topic', routing_key='u38.0.353.window.action.12345', body=action)
     pass
 
 
