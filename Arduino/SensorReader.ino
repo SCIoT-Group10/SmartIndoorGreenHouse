@@ -4,8 +4,8 @@
 #include <Wire.h>
 
 #define SOIL_MOISTURE_PIN A0
-#define RELAISPUMP 2
-#define RELAISLIGHT 3
+#define RELAISPUMP 3
+#define RELAISLIGHT 2
 #define DHTPIN 4
 
 #define DHTTYPE DHT22
@@ -19,6 +19,9 @@ void setup() {
     pinMode(SOIL_MOISTURE_PIN, INPUT);
     pinMode(RELAISPUMP, OUTPUT);
     pinMode(RELAISLIGHT, OUTPUT);
+
+    digitalWrite(RELAISLIGHT,HIGH);
+    digitalWrite(RELAISPUMP,HIGH);
 
     Serial.begin(9600); /* Begin der Seriellenkommunikation */
     dhtSensor.begin();
@@ -50,21 +53,24 @@ void loop() {
             getSoilMoisture();
             break;
         case 101: //received e
-            switchRelaisOn(RELAISLIGHT);
+            getWaterLevel();
             break;
         case 102: //received f
-            switchRelaisOff(RELAISLIGHT);
+            switchRelaisOn(RELAISLIGHT);
             break;
         case 103: //received g
-            switchRelaisOn(RELAISPUMP);
+            switchRelaisOff(RELAISLIGHT);
             break;
         case 104: //received h
-            switchRelaisOff(RELAISPUMP);
+            switchRelaisOn(RELAISPUMP);
             break;
         case 105: //received i
-            openWindow();
+            switchRelaisOff(RELAISPUMP);
             break;
         case 106: //received j
+            openWindow();
+            break;
+        case 107: //received k
             closeWindow();
             break;
         default:
@@ -80,11 +86,11 @@ void getSoilMoisture(){
 }
 
 void switchRelaisOn(int relais){
-    digitalWrite(relais,HIGH);
+    digitalWrite(relais,LOW);
 }
 
 void switchRelaisOff(int relais){
-    digitalWrite(relais,LOW);
+    digitalWrite(relais,HIGH);
 }
 
 void getLightSensorData(){
