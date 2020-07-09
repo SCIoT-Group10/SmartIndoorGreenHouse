@@ -2,6 +2,7 @@
 #include <DHT.h>
 #include <BH1750.h>
 #include <Wire.h>
+#include <Stepper.h>
 
 #define SOIL_MOISTURE_PIN A0
 #define RELAISPUMP 3
@@ -14,6 +15,9 @@ BH1750 lightSensor;
 DHT dhtSensor(DHTPIN, DHTTYPE);
 int incoming = 0;
 
+const int stepsPerRevolution = 2048;
+Stepper myStepper(stepsPerRevolution, 4, 6, 5, 7);
+
 
 void setup() {
     pinMode(SOIL_MOISTURE_PIN, INPUT);
@@ -22,6 +26,8 @@ void setup() {
 
     digitalWrite(RELAISLIGHT,HIGH);
     digitalWrite(RELAISPUMP,HIGH);
+
+    myStepper.setSpeed(15);
 
     Serial.begin(9600); /* Begin der Seriellenkommunikation */
     dhtSensor.begin();
@@ -115,9 +121,13 @@ void getWaterLevel(){
 }
 
 void openWindow(){
-
+    for(int i=0; i< stepsPerRevolution; i++){
+        myStepper.step(1);
+    }
 }
 
 void closeWindow(){
-
+    for(int i=0; i< stepsPerRevolution; i++){
+        myStepper.step(-1);
+    }
 }

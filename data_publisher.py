@@ -53,7 +53,9 @@ def getSoilMoisture():
 
 
 def getWaterLevel():
-    return "full"
+    ser.write(b"e")
+    line = ser.readline().decode('utf-8').rstrip()
+    return line
 
 
 if __name__ == '__main__':
