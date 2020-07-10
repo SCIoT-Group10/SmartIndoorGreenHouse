@@ -17,11 +17,53 @@ channel.queue_declare(queue='sciot.action')
 
 channel.queue_bind(queue='sciot.action', exchange='sciot.topic', routing_key='u38.0.353.*.action.*')
 
+lightOn = False
+windowOpen = False
+
 
 def callback(ch, method, properties, body):
     data = json.loads(body)
-    #ser.write(b"g")
+    # TODO: check time
+    # TODO: switch case
     print('Received: {}'.format(data))
+
+
+def lightsOn():
+    global lightOn
+    if not lightOn:
+        lightOn = True
+        ser.write(b"g")
+        print('Lights On')
+
+
+def lightsOff():
+    global lightOn
+    if not lightOn:
+        lightOn = True
+        ser.write(b"g")
+        print('Lights Off')
+
+
+def pump():
+    ser.write(b"h")
+    time.sleep(10)
+    ser.write(b"i")
+
+
+def openWindow():
+    global windowOpen
+    if not windowOpen:
+        windowOpen = True
+        ser.write(b"j")
+        print('Window open')
+
+
+def closeWindow():
+    global windowOpen
+    if windowOpen:
+        windowOpen = False
+        ser.write(b"k")
+        print('Window closed')
 
 
 channel.basic_consume(queue='sciot.action', on_message_callback=callback, auto_ack=True)

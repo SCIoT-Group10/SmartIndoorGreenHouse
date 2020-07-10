@@ -22,7 +22,7 @@ def planning(data):
     waterLevel = data['waterLevel']
     soilMoisture = data['soilMoisture']
 
-    action = "lightOn"
+    action = "lightsOff"
 
     data = {
         "time": time,
