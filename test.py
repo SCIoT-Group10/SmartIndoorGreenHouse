@@ -62,6 +62,7 @@ def getWaterLevel():
     line = ser.readline().decode('utf-8').rstrip()
     return line
 
+
 def function(self):
     channel2.basic_consume(queue='sciot.action', on_message_callback=callback, auto_ack=True)
     print('Waiting for messages')
@@ -70,9 +71,10 @@ def function(self):
 
 
 def callback(ch, method, properties, body):
-    #data = json.loads(body)
-    #print('Received: {}'.format(body))
+    # data = json.loads(body)
+    # print('Received: {}'.format(body))
     pass
+
 
 if __name__ == '__main__':
     start_new_thread(function, (99,))
@@ -84,4 +86,3 @@ if __name__ == '__main__':
 
         channel.basic_publish(exchange='sciot.topic', routing_key='u38.0.353.window.temperature.12345', body=jsonData)
         time.sleep(timeout)
-
