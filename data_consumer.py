@@ -1,5 +1,4 @@
 import json
-
 import pika
 
 credentials = pika.PlainCredentials('user', 'password')
@@ -24,7 +23,13 @@ def planning(data):
     soilMoisture = data['soilMoisture']
 
     action = "lightOn"
-    channel.basic_publish(exchange='sciot.topic', routing_key='u38.0.353.window.action.12345', body=action)
+
+    data = {
+        "time": time,
+        "operation": action
+    }
+    jsonData = json.dumps(data)
+    channel2.basic_publish(exchange='sciot.topic', routing_key='u38.0.353.window.action.12345', body=jsonData)
     pass
 
 

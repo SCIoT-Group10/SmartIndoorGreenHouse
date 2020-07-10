@@ -57,10 +57,6 @@ def getWaterLevel():
     line = ser.readline().decode('utf-8').rstrip()
     return line
 
-def callback(ch, method, properties, body):
-    data = json.loads(body)
-    print('Received: {}'.format(data))
-
 if __name__ == '__main__':
     while True:
         sensorValues = getSensorData()
