@@ -23,9 +23,18 @@ windowOpen = False
 
 def callback(ch, method, properties, body):
     data = json.loads(body)
+    time = data['time']
+    operation = data['operation']
+
+    if operation = 'lightsOff':
+        lightsOff()
+
+    if operation = 'lightsOn':
+        lightsOn()
+        
     # TODO: check time
     # TODO: switch case
-    print('Received: {}'.format(data))
+    print('Received: {}'.format(data['operation']))
 
 
 def lightsOn():

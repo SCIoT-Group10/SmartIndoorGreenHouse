@@ -22,7 +22,10 @@ def planning(data):
     waterLevel = data['waterLevel']
     soilMoisture = data['soilMoisture']
 
-    action = "lightsOff"
+    if lightLevel < 30:
+        action = "lightsOn"
+    else:
+        action = "lightsOff"
 
     data = {
         "time": time,
