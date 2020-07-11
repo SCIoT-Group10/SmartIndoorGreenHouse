@@ -26,28 +26,28 @@ def callback(ch, method, properties, body):
     time = data['time']
     operation = data['operation']
 
-    if operation = 'lightsOff':
+    if operation == "lightsOff":
         lightsOff()
 
-    if operation = 'lightsOn':
+    if operation == "lightsOn":
         lightsOn()
-        
+
     # TODO: check time
     # TODO: switch case
-    print('Received: {}'.format(data['operation']))
+    #print('Received: {}'.format(data['operation']))
 
 
 def lightsOn():
     global lightOn
     if not lightOn:
         lightOn = True
-        ser.write(b"g")
+        ser.write(b"f")
         print('Lights On')
 
 
 def lightsOff():
     global lightOn
-    if not lightOn:
+    if lightOn:
         lightOn = True
         ser.write(b"g")
         print('Lights Off')
