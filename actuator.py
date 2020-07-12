@@ -26,12 +26,12 @@ def callback(ch, method, properties, body):
     time = data['time']
     operation = data['operation']
 
-    if operation = 'lightsOff':
+    if operation == 'lightsOff':
         lightsOff()
 
-    if operation = 'lightsOn':
+    if operation == 'lightsOn':
         lightsOn()
-        
+
     # TODO: check time
     # TODO: switch case
     print('Received: {}'.format(data['operation']))

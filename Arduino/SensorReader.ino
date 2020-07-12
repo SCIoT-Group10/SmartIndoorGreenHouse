@@ -9,6 +9,11 @@
 #define RELAISLIGHT 2
 #define DHTPIN 4
 
+#define WATERBOT 9
+#define WATERMID 10
+#define WATERTOP 11
+
+
 #define DHTTYPE DHT22
 
 BH1750 lightSensor;
@@ -21,6 +26,11 @@ Stepper myStepper(stepsPerRevolution, 5, 7, 6, 8);
 
 void setup() {
     pinMode(SOIL_MOISTURE_PIN, INPUT);
+
+    pinMode(WATERBOT, INPUT);
+    pinMode(WATERMID, INPUT);
+    pinMode(WATERTOP, INPUT);
+
     pinMode(RELAISPUMP, OUTPUT);
     pinMode(RELAISLIGHT, OUTPUT);
 
@@ -117,7 +127,17 @@ void getHumidity(){
 }
 
 void getWaterLevel(){
-
+    if(digitalRead(WATERTOP)==HIGH && digitalRead(WATERMID)==HIGH && digitalRead(WATERBOT)==HIGH){
+        Serial.println("HIGH");
+    }else if (digitalRead(WATERTOP)==LOW && digitalRead(WATERMID)==HIGH && digitalRead(WATERBOT)==HIGH)
+    {
+        Serial.println("MIDDLE");
+    }else if (digitalRead(WATERTOP)==LOW && digitalRead(WATERMID)==LOW && digitalRead(WATERBOT)==HIGH)
+    {
+        Serial.println("LOW");
+    }else{
+        Serial.println("ERROR");
+    }
 }
 
 void openWindow(){
