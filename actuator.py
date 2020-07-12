@@ -24,22 +24,22 @@ windowOpen = False
 def callback(ch, method, properties, body):
     data = json.loads(body)
     time = data['time']
-    operation = data['operation']
+    operations = data['operation']
+    for operation in operations:
+        if operation == 'lightsOff':
+            lightsOff()
 
-    if operation == 'lightsOff':
-        lightsOff()
+        if operation == 'lightsOn':
+            lightsOn()
 
-    if operation == 'lightsOn':
-        lightsOn()
+        if operation == 'openWindow':
+            openWindow()
 
-    if operation == 'openWindow':
-        openWindow()
+        if operation == 'closeWindow':
+            closeWindow()
 
-    if operation == 'closeWindow':
-        closeWindow()
-
-    if operation == 'pump':
-        pump()
+        if operation == 'pump':
+            pump()
 
     # TODO: check time
     # TODO: switch case
