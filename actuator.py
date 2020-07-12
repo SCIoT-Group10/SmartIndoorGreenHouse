@@ -32,6 +32,15 @@ def callback(ch, method, properties, body):
     if operation == 'lightsOn':
         lightsOn()
 
+    if operation == 'openWindow':
+        openWindow()
+
+    if operation == 'closeWindow':
+        closeWindow()
+
+    if operation == 'pump':
+        pump()
+
     # TODO: check time
     # TODO: switch case
     #print('Received: {}'.format(data['operation']))
