@@ -27,24 +27,24 @@ lightLevel_threshold = [100, 400]
 soilMoisture_threshold = [700, 400]
 time_threshold = [8, 20]
 
-flags = [['brightnessHigh', False],
-         ['brightnessLow', False],
-         ['moistureHigh', False],
-         ['moistureLow', False],
-         ['waterHigh', False],
-         ['waterLow', False],
-         ['temperatureHigh', False],
-         ['temperatureLow', False],
-         ['humidityHigh', False],
-         ['humidityLow', False],
+flags = [['brightnesshigh', False],
+         ['brightnesslow', False],
+         ['moisturehigh', False],
+         ['moisturelow', False],
+         ['waterhigh', False],
+         ['waterlow', False],
+         ['temperaturehigh', False],
+         ['temperaturelow', False],
+         ['humidityhigh', False],
+         ['humiditylow', False],
          ['day', False],
          ['night', False],
-         ['pumpOn', False],
-         ['pumpOff', True],
-         ['lightsOn', False],
-         ['lightsOff', True],
-         ['windowOpen', False],
-         ['windowClosed', True]]
+         ['pumpon', False],
+         ['pumpoff', True],
+         ['lightson', False],
+         ['lightsoff', True],
+         ['windowopen', False],
+         ['windowclosed', True]]
 
 localtime = datetime.datetime.now()
 
@@ -60,55 +60,56 @@ pddl_Files = ["temperatureLowProblem.pddl", "temperatureHighProblem.pddl", "humi
               "moistureLowProblem.pddl"]
 
 
+# set flags for precondition check
 def setFlags():
     global flags
     if localtime.hour > time_threshold[0] & localtime.hour < time_threshold[1]:
         for flag in flags:
             if flag[0] == 'day':
-                flag[1]=True
+                flag[1] = True
             if flag[0] == 'night':
                 flag[1] = False
     if temperature < temperature_threshold[0]:
         for flag in flags:
-            if flag[0] == 'temperatureLow':
+            if flag[0] == 'temperaturelow':
                 flag[1] = True
-            if flag[0] == 'temperatureHigh':
+            if flag[0] == 'temperaturehigh':
                 flag[1] = False
     elif temperature > temperature_threshold[1]:
         for flag in flags:
-            if flag[0] == 'temperatureHigh':
+            if flag[0] == 'temperaturehigh':
                 flag[1] = True
-            if flag[0] == 'temperatureLow':
+            if flag[0] == 'temperaturelow':
                 flag[1] = False
     if humidity < humidity_threshold[0]:
         for flag in flags:
-            if flag[0] == 'humidityLow':
+            if flag[0] == 'humiditylow':
                 flag[1] = True
-            if flag[0] == 'humidityHigh':
+            if flag[0] == 'humidityhigh':
                 flag[1] = False
     elif humidity > humidity_threshold[1]:
         for flag in flags:
-            if flag[0] == 'humidityHigh':
+            if flag[0] == 'humidityhigh':
                 flag[1] = True
-            if flag[0] == 'humidityLow':
+            if flag[0] == 'humiditylow':
                 flag[1] = False
     if lightLevel < lightLevel_threshold[0]:
         for flag in flags:
-            if flag[0] == 'brightnessLow':
+            if flag[0] == 'brightnesslow':
                 flag[1] = True
-            if flag[0] == 'brightnessHigh':
+            if flag[0] == 'brightnesshigh':
                 flag[1] = False
     elif lightLevel > lightLevel_threshold[1]:
         for flag in flags:
-            if flag[0] == 'brightnessHigh':
+            if flag[0] == 'brightnesshigh':
                 flag[1] = True
-            if flag[0] == 'brightnessLow':
+            if flag[0] == 'brightnesslow':
                 flag[1] = False
     if soilMoisture > soilMoisture_threshold[0]:
         for flag in flags:
-            if flag[0] == 'moistureLow':
+            if flag[0] == 'moisturelow':
                 flag[1] = True
-            if flag[0] == 'moistureHigh':
+            if flag[0] == 'moisturehigh':
                 flag[1] = False
 
     print(flags)
@@ -117,41 +118,31 @@ def setFlags():
 def planning(data):
     actions = []
 
-    global localtime
-    global time
-    global temperature
-    global humidity
-    global lightLevel
-    global waterLevel
-    global soilMoisture
-
-    localtime = datetime.datetime.now()
-    time = data['time']
-    temperature = data['temperature']
-    humidity = data['humidity']
-    lightLevel = data['lightLevel']
-    waterLevel = data['waterLevel']
-    soilMoisture = data['soilMoisture']
-
-    setFlags()
+    # check pddl files and each precondition and send actions to raspberry
 
     for problem in pddl_Files:
         precondition, effects = solve(problem)
         for pre in precondition:
+            count = 0
             for flag in flags:
                 if pre == flag:
-                        print(pre)
-
-        for effect in effects:
-            for flag in flags:
-                if effects[0] == flags[0]:
-                    flags[flag] = effect
-
-    # if localtime.hour > time_threshold[0] & localtime.hour < time_threshold[1]:
-    #   if temperature < temperature_threshold[0]:
-    #       preconditions, effects = solve('humidityLowProblem.pddl')
-    # print(preconditions)
-
+                    count = count + 1
+            if count == len(precondition):
+                print(pre)
+                for effect in effects:
+                    for flag in flags:
+                        if effects[0] == flags[0]:
+                            flags[flag] = effect
+                    if flag[0] == 'windowopen' & flag[1] == True:
+                        actions.append("openWindow")
+                    if flag[0] == 'windowclose' & flag[1] == True:
+                        actions.append("closeWindow")
+                    if flag[0] == 'lightson' & flag[1] == True:
+                        actions.append("lightsOn")
+                    if flag[0] == 'lightsoff' & flag[1] == True:
+                        actions.append("lightsOff")
+                    if flag[0] == 'pumpon' & flag[1] == True:
+                        actions.append("pump")
     print(actions)
 
     data = {
@@ -162,6 +153,8 @@ def planning(data):
     channel2.basic_publish(exchange='sciot.topic', routing_key='u38.0.353.window.action.12345', body=jsonData)
     pass
 
+
+# get preconditions from pddl plan
 
 def getPreconditions(action_string):
     preconditions = []
@@ -186,6 +179,8 @@ def getPreconditions(action_string):
     pass
 
 
+# get effect from pddl plan
+
 def getEffects(action_string):
     effects = []
     z = action_string.split(":")
@@ -209,6 +204,7 @@ def getEffects(action_string):
     pass
 
 
+# solve pddl problem
 def solve(problem):
     planningData = {'domain': open("greenHouseDomain.pddl", 'r').read(),
                     'problem': open(problem, 'r').read()}
@@ -224,9 +220,29 @@ def solve(problem):
 def callback(ch, method, properties, body):
     data = json.loads(body)
     planning(data)
+
+    global localtime
+    global time
+    global temperature
+    global humidity
+    global lightLevel
+    global waterLevel
+    global soilMoisture
+
+    localtime = datetime.datetime.now()
+    time = data['time']
+    temperature = data['temperature']
+    humidity = data['humidity']
+    lightLevel = data['lightLevel']
+    waterLevel = data['waterLevel']
+    soilMoisture = data['soilMoisture']
+
+    setFlags()
+
     print('Received: {}'.format(data))
 
 
+# UI
 def ui_thread(name):
     global temperature_threshold
     global humidity_threshold
