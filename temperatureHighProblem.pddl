@@ -3,6 +3,7 @@
 (:init
     (temperatureHigh)
     (windowClosed)
+    (day)
 )
 
 (:goal (and

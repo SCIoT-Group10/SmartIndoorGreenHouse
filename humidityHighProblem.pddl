@@ -3,6 +3,7 @@
 (:init
     (humidityHigh)
     (windowClosed)
+    (day)
 )
 
 (:goal (and
