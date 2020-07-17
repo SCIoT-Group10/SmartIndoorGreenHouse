@@ -3,6 +3,7 @@
 (:init
     (brightnessHigh)
     (lightsOn)
+    (day)
 )
 
 (:goal (and

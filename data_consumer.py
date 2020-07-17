@@ -3,7 +3,6 @@ import pika
 import threading
 import PySimpleGUI as sg
 import datetime
-import time as ttime
 import requests
 
 credentials = pika.PlainCredentials('user', 'password')
@@ -23,7 +22,7 @@ planningData = {'domain': open('greenHouseDomain.pddl', 'r').read(),
 
 temperature_threshold = [23.0, 30.0]
 humidity_threshold = [50, 70]
-lightLevel_threshold = [100, 400]
+lightLevel_threshold = [400, 600]
 soilMoisture_threshold = [700, 400]
 time_threshold = [8, 20]
 
@@ -31,7 +30,7 @@ flags = [['brightnesshigh', False],
          ['brightnesslow', False],
          ['moisturehigh', False],
          ['moisturelow', False],
-         ['waterhigh', False],
+         ['waterhigh', True],
          ['waterlow', False],
          ['temperaturehigh', False],
          ['temperaturelow', False],
@@ -111,8 +110,7 @@ def setFlags():
                 flag[1] = True
             if flag[0] == 'moisturehigh':
                 flag[1] = False
-
-    print(flags)
+    #print(flags)
 
 
 def planning(data):
@@ -122,27 +120,27 @@ def planning(data):
 
     for problem in pddl_Files:
         precondition, effects = solve(problem)
-        for pre in precondition:
-            count = 0
-            for flag in flags:
-                if pre == flag:
-                    count = count + 1
-            if count == len(precondition):
-                print(pre)
-                for effect in effects:
-                    for flag in flags:
-                        if effects[0] == flags[0]:
-                            flags[flag] = effect
-                    if flag[0] == 'windowopen' & flag[1] == True:
+
+        if all(item in flags for item in precondition):
+            for effect in effects:
+                if effect[0] == 'windowopen':
+                    if effect[1] == True:
                         actions.append("openWindow")
-                    if flag[0] == 'windowclose' & flag[1] == True:
+                if effect[0] == 'windowclose':
+                    if effect[1] == True:
                         actions.append("closeWindow")
-                    if flag[0] == 'lightson' & flag[1] == True:
+                if effect[0] == 'lightson':
+                    if effect[1] == True:
                         actions.append("lightsOn")
-                    if flag[0] == 'lightsoff' & flag[1] == True:
+                if effect[0] == 'lightsoff':
+                    if effect[1] == True:
                         actions.append("lightsOff")
-                    if flag[0] == 'pumpon' & flag[1] == True:
+                if effect[0] == 'pumpon':
+                    if effect[1] == True:
                         actions.append("pump")
+            for i in range(len(flags)):
+                if effect[0] == flags[i][0]:
+                    flags[i] = effect
     print(actions)
 
     data = {
@@ -219,7 +217,6 @@ def solve(problem):
 
 def callback(ch, method, properties, body):
     data = json.loads(body)
-    planning(data)
 
     global localtime
     global time
@@ -238,6 +235,8 @@ def callback(ch, method, properties, body):
     soilMoisture = data['soilMoisture']
 
     setFlags()
+
+    planning(data)
 
     print('Received: {}'.format(data))
 
